@@ -314,10 +314,9 @@
 
 <!-- ============ MAJOR MODAL ============ -->
 <div id="modal" class="fixed inset-0 z-50 hidden">
-  <div class="modal-scrim absolute inset-0" data-close></div>
-  <div class="absolute inset-0 grid place-items-center p-4">
+  <div id="modalBackdrop" class="modal-scrim absolute inset-0 grid place-items-center p-4">
     <div class="relative w-full max-w-lg rounded-3xl bg-white shadow-lift max-h-[88vh] overflow-y-auto" role="dialog" aria-modal="true">
-      <button data-close class="absolute top-4 end-4 grid place-items-center h-9 w-9 rounded-full bg-brand-50 text-brand-800 hover:bg-brand-100 transition-colors" aria-label="Close">
+      <button data-close class="absolute top-4 end-4 z-20 grid place-items-center h-9 w-9 rounded-full bg-white/90 text-brand-800 hover:bg-white shadow-md ring-1 ring-black/5 transition-colors" aria-label="Close">
         <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
       </button>
       <div id="modalBody" class="p-7 sm:p-8"></div>
@@ -328,9 +327,9 @@
 <script>
 /* ---------------- DATA ---------------- */
 const UNIS = {
-  KFUPM: { abbr:'KFUPM', img:'images/kfupm.png', en:{name:'King Fahd University of Petroleum & Minerals', city:'Dhahran', note:'The Kingdom’s benchmark for engineering, energy, and applied sciences.'}, ar:{name:'جامعة الملك فهد للبترول والمعادن', city:'الظهران', note:'المرجع الأول في المملكة للهندسة والطاقة والعلوم التطبيقية.'} },
+  KFUPM: { abbr:'KFUPM', logo:'images/kfupm-logo.webp', img:'images/kfupm.png', en:{name:'King Fahd University of Petroleum & Minerals', city:'Dhahran', note:'The Kingdom’s benchmark for engineering, energy, and applied sciences.'}, ar:{name:'جامعة الملك فهد للبترول والمعادن', city:'الظهران', note:'المرجع الأول في المملكة للهندسة والطاقة والعلوم التطبيقية.'} },
   KSU:   { abbr:'KSU',   logo:'images/ksu-logo.png', en:{name:'King Saud University', city:'Riyadh', note:'Broadest engineering college in the country with deep research capacity.'}, ar:{name:'جامعة الملك سعود', city:'الرياض', note:'أوسع كلية هندسة في البلاد مع قدرات بحثية عميقة.'} },
-  KAU:   { abbr:'KAU',   img:'images/kau.png', en:{name:'King Abdulaziz University', city:'Jeddah', note:'Strong applied engineering and one of the region’s top-ranked universities.'}, ar:{name:'جامعة الملك عبدالعزيز', city:'جدة', note:'هندسة تطبيقية قوية ومن أعلى الجامعات تصنيفاً في المنطقة.'} },
+  KAU:   { abbr:'KAU',   logo:'images/kau-logo.jpg', img:'images/kau.png', en:{name:'King Abdulaziz University', city:'Jeddah', note:'Strong applied engineering and one of the region’s top-ranked universities.'}, ar:{name:'جامعة الملك عبدالعزيز', city:'جدة', note:'هندسة تطبيقية قوية ومن أعلى الجامعات تصنيفاً في المنطقة.'} },
   KAUST: { abbr:'KAUST', logo:'images/kaust-logo.png', en:{name:'King Abdullah University of Science & Technology', city:'Thuwal', note:'Elite graduate research university (Master’s & PhD) in science and engineering.'}, ar:{name:'جامعة الملك عبدالله للعلوم والتقنية', city:'ثول', note:'جامعة بحثية للدراسات العليا (ماجستير ودكتوراه) في العلوم والهندسة.'} },
   ALF:   { abbr:'Alfaisal', logo:'images/alfaisal-logo.png', en:{name:'Alfaisal University', city:'Riyadh', note:'Private, English-medium university with strong engineering and medical links.'}, ar:{name:'جامعة الفيصل', city:'الرياض', note:'جامعة خاصة بلغة إنجليزية بروابط قوية في الهندسة والطب.'} },
   IAU:   { abbr:'IAU',   logo:'images/iau-logo.svg', en:{name:'Imam Abdulrahman Bin Faisal University', city:'Dammam', note:'Established engineering and architecture programs in the Eastern Province.'}, ar:{name:'جامعة الإمام عبدالرحمن بن فيصل', city:'الدمام', note:'برامج هندسة وعمارة عريقة في المنطقة الشرقية.'} }
@@ -462,13 +461,13 @@ function renderUnis(){
   $('#uniGrid').innerHTML = feature.map(k=>{
     const u = UNIS[k]; const info = u[lang];
     let header;
-    if (u.img) {
-      header = `<img src="${u.img}" alt="${info.name}" loading="lazy" class="absolute inset-0 w-full h-full object-cover">
-        <div class="absolute inset-0 bg-gradient-to-t from-brand-900/70 to-transparent"></div>`;
-    } else if (u.logo) {
+    if (u.logo) {
       header = `<div class="absolute inset-0 bg-white grid place-items-center p-6">
           <img src="${u.logo}" alt="${info.name}" class="max-h-16 max-w-[70%] object-contain">
         </div>`;
+    } else if (u.img) {
+      header = `<img src="${u.img}" alt="${info.name}" loading="lazy" class="absolute inset-0 w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-t from-brand-900/70 to-transparent"></div>`;
     } else {
       header = `<div class="absolute inset-0 bg-gradient-to-br from-brand-600 to-brand-900 grid place-items-center"><span class="text-3xl font-extrabold text-white/85 tracking-tight">${u.abbr}</span></div>`;
     }
@@ -527,8 +526,10 @@ function openModal(id){
   document.body.style.overflow='hidden';
 }
 function closeModal(){ modal.classList.add('hidden'); document.body.style.overflow=''; }
+const modalBackdrop = $('#modalBackdrop');
+modalBackdrop.addEventListener('click', e=>{ if(e.target===modalBackdrop) closeModal(); });
 modal.querySelectorAll('[data-close]').forEach(el=>el.addEventListener('click',closeModal));
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape' && !modal.classList.contains('hidden')) closeModal(); });
 
 /* ---------------- LANGUAGE TOGGLE ---------------- */
 function applyLang(next){
